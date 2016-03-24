@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SI rocks</title>
+    <style>
+      body {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .textDisplay { 
+        display: inline;
+      }
+    </style>
+    <script>
+      'use strict'
+      const TICK_LENGTH = 100 // milliseconds
+      class Reality {
+        constructor(controls, sensors, goals, duration, tick, finish) {
+          this.controls = controls
+          this.sensors = sensors
+          this.goals = goals
+          this.duration = duration
+          this.tick = tick
+          this.finish = finish
+        }
+      }
+      class Button {
+        constructor(name, type) {
+          this.name = name
+          this.type = type
+        }
+      }
+      class Sensor {
+        constructor(name, type, initial, min, max) {
+          this.name = name
+          this.type = type
+          this.value = initial
+          if (this.type == 'integer') {
+            this.min = min
+            this.max = max
+          }
+        }
+      }
+      let realities = {}
+      realities.simpleTurret = new Reality(
+        [new Control('fire', 'button')],
+        [new Sensor('ammunition', 'integer', 50, 0, 50), new Sensor('trappedSoldiers', 'integer', 300, 0, 300)],
+        [new Goal('')]
+
+      )
+      let activeReality = {}
+      let startHuman = function() {
+        activeReality.setup()
+        drawControls(activeReality.controls)
+        drawSensors(activeReality.sensors)
+        drawGoals(activeReality.goals)
+        setTimeout(activeReality.duration, activeReality.finish)
+        activeReality.cancelTick = setInterval(TICK_LENGTH, activeReality.tick)
+      }
+    </script>
+  </head>
+  <body>
+  <h1>cuttlefish</h1>
+  <button onclick="startHuman()">start human</button><button>start SI</button>
+  <br>
+  time left: <div class="textDisplay" id='timeLeft'>---</div>
+  <hr>
+  <h1>sensors</h1>
+  <div id='sensors'></div>
+  <hr>
+  <h1>controls</h1>
+  <div id='controls'></div>
+  </body>
+</html>
