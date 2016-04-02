@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>si-cuttlefish</title>
+    <style>
+      body {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .integerSensor, .booleanSensor {
+        display: inline-block; 
+        padding: 5px;
+        margin: 5px;
+        border-style: solid;
+        border-width: 1px;
+      }
+      .booleanSensor .light {
+        display: inline-block;
+        width: 14px;
+        height: 8px;
+        border-style: solid;
+        border-color: black;
+        border-width: 1px;
+      }
+      .booleanSensor .light.true {
+        background-color: orange;
+      }
+      .booleanSensor .light.false {
+        background-color: #333333;
+      }
+      a.buttonControl {
+        display: inline-block;
+        background: #ccc;
+        cursor: pointer;
+        border-top: solid 2px #eaeaea;
+        border-left: solid 2px #eaeaea;
+        border-bottom: solid 2px #777;
+        border-right: solid 2px #777;
+        padding: 5px 5px;       
+      }
+      a.buttonControl.down {
+        display: inline-block;
+        background: #bbb;
+        border-top: solid 2px #777;
+        border-left: solid 2px #777;
+        border-bottom:solid 2px  #eaeaea;
+        border-right: solid 2px #eaeaea;
+      }
+    </style>
+    <script type="text/javascript" src="./jquery-2.2.2.js"></script>
+    <script type="text/javascript" src="./classes.js"></script>
+    <script type="text/javascript" src="./realities/simple-turret.js"></script>
+    <script>
+      'use strict'
+      let reality = simpleTurret
+      let tick = 0
+      let drawGoals = function(goals) {
+        $('#goals').html('<div style="display: inline-block; border-color: gold; border-style: solid; border-thickness:1px; padding: 5px;"><ul id="goalList"></ul></div>')
+        goals.forEach(goal => {
+          $('#goalList').append(`<li>${goal.name}: ${goal.maxOrMin} ${goal.sensorTarget}</li>`)
+        })
+      }
+      let drawSensors = function(sensors) {
+        $('#sensors').html(`tick: <b>${tick}</b><br>`)
+        sensors.forEach(sensor => {
+          switch (sensor.type) {
+            case 'integer':
+              $('#sensors').append(`<div class="integerSensor">${sensor.min} &lt; <b>${sensor.value}</b> &lt; ${sensor.max}<br>${sensor.name}</div>`)
+              break
+            case 'boolean':
+              $('#sensors').append(`<div class="booleanSensor"><div class="light ${sensor.value}"></div><br>${sensor.name}</div>`)
+              break
+          }
+        })
+      }
+      let drawControls = function(controls) {
+        $('#controls').html('')
+        controls.forEach(control => {
+          switch (control.type) {
+            case 'pushButton':
+              let downClass
+              control.value ? downClass = 'down' : downClass = ''
+              $('#controls').append(`<a class="buttonControl ${downClass}" onclick="$(this).toggleClass('down'); getControlByName('${control.name}').value = !getControlByName('${control.name}').value">${control.name}</a>`)
+              break
+          }
+          $('#controls').append('<br><br><button onclick="reality.tickCallback(tick); tick = tick + 1; draw()">go (step forward in time)</button>')
+        })
+      }
+      let getControlByName = function(name) {
+        let found = null
+        reality.controls.forEach(control => {
+          if (control.name === name) {
+            found = control
+          }
+        })
+        return found
+      }
+      let draw = function() { 
+        drawGoals(reality.goals)
+        drawSensors(reality.sensors)
+        drawControls(reality.controls)
+      }
+      $(document).ready(function() {
+        $('#screenTitle').html(`human, the loaded reality is <span style="color:#999999;">${reality.name}</span>`)
+        draw()
+      })
+    </script>
+  </head>
+  <body>
+  <h1 id="screenTitle"></h1>
+  <hr>
+  <h2>goals</h2>
+  <div id='goals'></div>
+  <br><hr>
+  <h2>sensors</h2>
+  <div id='sensors'></div>
+  <br><hr>
+  <h2>controls</h2>
+  <div id='controls'></div>
+  </body>
+</html>
